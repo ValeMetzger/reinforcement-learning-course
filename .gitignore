@@ -169,8 +169,6 @@ solutions/
 .vscode/
 
 # exclude next
-Lab_2.md
-2_FrozenLake_PolicyEval.py
 Lab_3.md
 3_FrozenLake_Prediction.py
 Lab_4.md
