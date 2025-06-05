@@ -171,8 +171,6 @@ solutions/*
 .vscode/
 
 # exclude next
-Lab_4.md
-4_FrozenLake_Control.py
 data/
 Lab_5.md
 5_PyTorch_Example.ipynb
