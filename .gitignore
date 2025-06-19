@@ -162,6 +162,7 @@ solutions/*
 !solutions/S3_FrozenLake_Prediction_Task1.py
 !solutions/S3_FrozenLake_Prediction_Task2.py
 !solutions/S3_FrozenLake_Prediction_Task3.py
+!solutions/S6_DQN_LunarLander.ipynb
 
 # PyCharm
 #  JetBrains specific template is maintained in a separate JetBrains.gitignore that can
@@ -174,11 +175,6 @@ solutions/*
 .vscode/
 
 # exclude next
-data/
-Lab_5.md
-5_PyTorch_Example.ipynb
-Lab_6.md
-6_DQN_LunarLander.ipynb
 Lab_7.md
 7_PolicyBased_Actor-Critic.ipynb
 7_PolicyBased_CEM.ipynb
