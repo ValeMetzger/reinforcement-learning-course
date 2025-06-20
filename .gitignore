@@ -162,6 +162,9 @@ solutions/*
 !solutions/S3_FrozenLake_Prediction_Task1.py
 !solutions/S3_FrozenLake_Prediction_Task2.py
 !solutions/S3_FrozenLake_Prediction_Task3.py
+!solutions/S4_FrozenLake_Control_Task1.py
+!solutions/S4_FrozenLake_Control_Task2.py
+!solutions/S4_FrozenLake_Control_Task3.py
 !solutions/S6_DQN_LunarLander.ipynb
 
 # PyCharm
