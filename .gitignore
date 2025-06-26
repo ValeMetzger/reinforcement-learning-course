@@ -165,7 +165,10 @@ solutions/*
 !solutions/S4_FrozenLake_Control_Task1.py
 !solutions/S4_FrozenLake_Control_Task2.py
 !solutions/S4_FrozenLake_Control_Task3.py
+!solutions/S5_PyTorch_Example.ipynb
 !solutions/S6_DQN_LunarLander.ipynb
+!solutions/S7_PolicyBased_Actor-Critic.ipynb
+!solutions/S7_PolicyBased_CEM.ipynb
 
 # PyCharm
 #  JetBrains specific template is maintained in a separate JetBrains.gitignore that can
@@ -178,6 +181,3 @@ solutions/*
 .vscode/
 
 # exclude next
-Lab_7.md
-7_PolicyBased_Actor-Critic.ipynb
-7_PolicyBased_CEM.ipynb
