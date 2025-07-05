@@ -124,6 +124,73 @@ class TicTacToeEnvironment:
         print(self.game_state[3:6])
         print(self.game_state[6:9])
 
+class AgentTrainer:
+    def __init__(self, agent, environment):
+        self.agent = agent
+        self.env = environment
+        self.training_stats = {
+            'episodes': 0,
+            'wins': 0,
+            'losses': 0,
+            'draws': 0,
+            'total_reward': 0
+        }
+    
+    def train_agent(self, episodes=1000):
+        """Train the agent before game starts"""
+        print(f"Starting training for {episodes} episodes...")
+        
+        for episode in range(episodes):
+            state = self.env.reset()
+            done = False
+            episode_reward = 0
+            
+            while not done:
+                action = self.agent.select_action(state)
+                next_state, reward, done, info = self.env.step(action)
+                
+                # Update Q-table
+                self.agent.update_q_table(state, action, reward, next_state, done)
+                
+                state = next_state
+                episode_reward += reward
+            
+            # Update statistics
+            self._update_stats(episode_reward, info)
+            
+            # Log progress every 100 episodes
+            if episode % 100 == 0:
+                self._log_progress(episode)
+        
+        print("Training completed!")
+        self._log_final_stats()
+    
+    def _update_stats(self, reward, info):
+        self.training_stats['episodes'] += 1
+        self.training_stats['total_reward'] += reward
+        
+        winner = info.get('winner')
+        if winner == 'agent':
+            self.training_stats['wins'] += 1
+        elif winner == 'opponent':
+            self.training_stats['losses'] += 1
+        else:
+            self.training_stats['draws'] += 1
+    
+    def _log_progress(self, episode):
+        if self.training_stats['episodes'] > 0:
+            win_rate = self.training_stats['wins'] / self.training_stats['episodes']
+            avg_reward = self.training_stats['total_reward'] / self.training_stats['episodes']
+            print(f"Episode {episode}: Win Rate: {win_rate:.2%}, Avg Reward: {avg_reward:.2f}")
+    
+    def _log_final_stats(self):
+        total = self.training_stats['episodes']
+        print(f"\nFinal Training Stats:")
+        print(f"Total Episodes: {total}")
+        print(f"Wins: {self.training_stats['wins']} ({self.training_stats['wins']/total:.2%})")
+        print(f"Losses: {self.training_stats['losses']} ({self.training_stats['losses']/total:.2%})")
+        print(f"Draws: {self.training_stats['draws']} ({self.training_stats['draws']/total:.2%})")
+
 
 # Legacy functions for compatibility
 game_state = ["_" for i in range(0, 9)]
@@ -214,73 +281,6 @@ class SimpleAgent:
         
         self.q_table[state_key][action] += alpha * (target - self.q_table[state_key][action])
 
-
-class AgentTrainer:
-    def __init__(self, agent, environment):
-        self.agent = agent
-        self.env = environment
-        self.training_stats = {
-            'episodes': 0,
-            'wins': 0,
-            'losses': 0,
-            'draws': 0,
-            'total_reward': 0
-        }
-    
-    def train_agent(self, episodes=1000):
-        """Train the agent before game starts"""
-        print(f"Starting training for {episodes} episodes...")
-        
-        for episode in range(episodes):
-            state = self.env.reset()
-            done = False
-            episode_reward = 0
-            
-            while not done:
-                action = self.agent.select_action(state)
-                next_state, reward, done, info = self.env.step(action)
-                
-                # Update Q-table
-                self.agent.update_q_table(state, action, reward, next_state, done)
-                
-                state = next_state
-                episode_reward += reward
-            
-            # Update statistics
-            self._update_stats(episode_reward, info)
-            
-            # Log progress every 100 episodes
-            if episode % 100 == 0:
-                self._log_progress(episode)
-        
-        print("Training completed!")
-        self._log_final_stats()
-    
-    def _update_stats(self, reward, info):
-        self.training_stats['episodes'] += 1
-        self.training_stats['total_reward'] += reward
-        
-        winner = info.get('winner')
-        if winner == 'agent':
-            self.training_stats['wins'] += 1
-        elif winner == 'opponent':
-            self.training_stats['losses'] += 1
-        else:
-            self.training_stats['draws'] += 1
-    
-    def _log_progress(self, episode):
-        if self.training_stats['episodes'] > 0:
-            win_rate = self.training_stats['wins'] / self.training_stats['episodes']
-            avg_reward = self.training_stats['total_reward'] / self.training_stats['episodes']
-            print(f"Episode {episode}: Win Rate: {win_rate:.2%}, Avg Reward: {avg_reward:.2f}")
-    
-    def _log_final_stats(self):
-        total = self.training_stats['episodes']
-        print(f"\nFinal Training Stats:")
-        print(f"Total Episodes: {total}")
-        print(f"Wins: {self.training_stats['wins']} ({self.training_stats['wins']/total:.2%})")
-        print(f"Losses: {self.training_stats['losses']} ({self.training_stats['losses']/total:.2%})")
-        print(f"Draws: {self.training_stats['draws']} ({self.training_stats['draws']/total:.2%})")
 
 
 if __name__ == "__main__":
