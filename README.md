@@ -1,3 +1,6 @@
+This course was held by @c-reichhardt
+github-repository has been cloned from: https://github.com/c-reichhardt/rl-course-ss25
+
 # Course: Introduction to Reinforcement Learning
 
 The recommended way to setup your development environment is to use Anaconda:
