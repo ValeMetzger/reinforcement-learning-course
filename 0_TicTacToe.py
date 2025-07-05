@@ -49,10 +49,10 @@ class TicTacToeEnvironment:
         for cell in self.game_state:
             if cell == "_":
                 state.append(0)
-            elif cell == "x":  # agent
-                state.append(1)
-            elif cell == "o":  # opponent
+            elif cell == "x":  # human player
                 state.append(-1)
+            elif cell == "o":  # agent
+                state.append(1)
         return np.array(state)
     
     def is_valid_move(self, position):
@@ -77,11 +77,11 @@ class TicTacToeEnvironment:
         for combination in winning_combinations:
             if (self.game_state[combination[0]] == 
                 self.game_state[combination[1]] == 
-                self.game_state[combination[2]] == "x"):
+                self.game_state[combination[2]] == "o"):
                 return "agent"
             elif (self.game_state[combination[0]] == 
                   self.game_state[combination[1]] == 
-                  self.game_state[combination[2]] == "o"):
+                  self.game_state[combination[2]] == "x"):
                 return "opponent"
         
         if "_" not in self.game_state:
@@ -93,16 +93,16 @@ class TicTacToeEnvironment:
         """Execute one step in the environment"""
         state = self.get_state()
         
-        # Agent makes move
-        valid_move = self.make_move(action, "x")
+        # Agent makes move with "o"
+        valid_move = self.make_move(action, "o")
         winner = self.check_winner()
         done = winner is not None
         
-        # If game not done, opponent makes move
+        # If game not done, opponent (human) makes move
         if not done:
             opponent_action = self.get_random_opponent_move()
             if opponent_action is not None:
-                self.make_move(opponent_action, "o")
+                self.make_move(opponent_action, "x")
                 winner = self.check_winner()
                 done = winner is not None
         
@@ -123,6 +123,7 @@ class TicTacToeEnvironment:
         print(self.game_state[0:3])
         print(self.game_state[3:6])
         print(self.game_state[6:9])
+
 
 class AgentTrainer:
     def __init__(self, agent, environment):
@@ -191,6 +192,53 @@ class AgentTrainer:
         print(f"Losses: {self.training_stats['losses']} ({self.training_stats['losses']/total:.2%})")
         print(f"Draws: {self.training_stats['draws']} ({self.training_stats['draws']/total:.2%})")
 
+class SimpleAgent:
+    def __init__(self, epsilon=0.1):
+        self.epsilon = epsilon
+        self.q_table = {}
+    
+    def get_state_key(self, state):
+        """Convert state array to string key for Q-table"""
+        return str(state.tolist())
+    
+    def select_action(self, state):
+        """Select action using epsilon-greedy strategy"""
+        state_key = self.get_state_key(state)
+        
+        # Get available actions (empty positions)
+        available_actions = [i for i in range(9) if state[i] == 0]
+        
+        if not available_actions:
+            return 0
+        
+        # Epsilon-greedy action selection
+        if random.random() < self.epsilon or state_key not in self.q_table:
+            return random.choice(available_actions)
+        
+        # Choose best action from Q-table
+        q_values = self.q_table[state_key]
+        best_action = max(available_actions, key=lambda x: q_values[x])
+        return best_action
+    
+    def update_q_table(self, state, action, reward, next_state, done, alpha=0.1, gamma=0.9):
+        """Update Q-table using Q-learning"""
+        state_key = self.get_state_key(state)
+        next_state_key = self.get_state_key(next_state)
+        
+        # Initialize Q-values if not exists
+        if state_key not in self.q_table:
+            self.q_table[state_key] = [0.0] * 9
+        if next_state_key not in self.q_table:
+            self.q_table[next_state_key] = [0.0] * 9
+        
+        # Q-learning update
+        if done:
+            target = reward
+        else:
+            target = reward + gamma * max(self.q_table[next_state_key])
+        
+        self.q_table[state_key][action] += alpha * (target - self.q_table[state_key][action])
+
 
 # Legacy functions for compatibility
 game_state = ["_" for i in range(0, 9)]
@@ -232,57 +280,6 @@ def game_finished():
     return False
 
 
-
-
-class SimpleAgent:
-    def __init__(self, epsilon=0.1):
-        self.epsilon = epsilon
-        self.q_table = {}
-    
-    def get_state_key(self, state):
-        """Convert state array to string key for Q-table"""
-        return str(state.tolist())
-    
-    def select_action(self, state):
-        """Select action using epsilon-greedy strategy"""
-        state_key = self.get_state_key(state)
-        
-        # Get available actions
-        available_actions = [i for i in range(9) if state[i] == 0]
-        
-        if not available_actions:
-            return 0
-        
-        # Epsilon-greedy action selection
-        if random.random() < self.epsilon or state_key not in self.q_table:
-            return random.choice(available_actions)
-        
-        # Choose best action from Q-table
-        q_values = self.q_table[state_key]
-        best_action = max(available_actions, key=lambda x: q_values[x])
-        return best_action
-    
-    def update_q_table(self, state, action, reward, next_state, done, alpha=0.1, gamma=0.9):
-        """Update Q-table using Q-learning"""
-        state_key = self.get_state_key(state)
-        next_state_key = self.get_state_key(next_state)
-        
-        # Initialize Q-values if not exists
-        if state_key not in self.q_table:
-            self.q_table[state_key] = [0.0] * 9
-        if next_state_key not in self.q_table:
-            self.q_table[next_state_key] = [0.0] * 9
-        
-        # Q-learning update
-        if done:
-            target = reward
-        else:
-            target = reward + gamma * max(self.q_table[next_state_key])
-        
-        self.q_table[state_key][action] += alpha * (target - self.q_table[state_key][action])
-
-
-
 if __name__ == "__main__":
     # Training phase
     print("=== TRAINING PHASE ===")
@@ -311,9 +308,9 @@ if __name__ == "__main__":
         winner = env.check_winner()
         if winner:
             if winner == "agent":
-                print("Player x wins!")
+                print("Computer (o) wins!")
             elif winner == "opponent":
-                print("Player o wins!")
+                print("You (x) win!")
             else:
                 print("It's a draw!")
             break
@@ -332,7 +329,7 @@ if __name__ == "__main__":
                 state = env.get_state()
                 agent_action = agent.select_action(state)
                 if env.make_move(agent_action, "o"):
-                    print(f"Computer plays at position {agent_action}")
+                    print(f"Computer plays 'o' at position {agent_action}")
                     env.print_board()
             else:
                 print("Invalid move! Try again.")
