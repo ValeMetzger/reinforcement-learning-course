@@ -81,3 +81,23 @@ def policy_evaluation(policy, theta=0.0001):
             break
     return V
 
+# Policy improvement testing
+
+def create_random_policy():
+    """Create a random policy where each action has equal probability"""
+    policy = {}
+    num_actions = len(actions)
+    for s in states:
+        policy[s] = {a: 1.0/num_actions for a in actions}
+    return policy
+
+# Run tests
+print("=" * 50)
+print("Testing Policy Evaluation")
+print("=" * 50)
+
+# Test policy
+print("\n1. Random Policy:")
+random_policy = create_random_policy()
+V_random = policy_evaluation(random_policy)
+print(f"Value function:\n{V_random.reshape(4, 4)}")
